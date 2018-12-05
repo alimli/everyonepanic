@@ -50,9 +50,8 @@ def get_uptime_status():
 def trigger_call(recipients):
     client = TwilioRestClient(TWILIO_SID, TWILIO_TOKEN)
     for recp in recipients:
-        self.response.write("https://%s/downmessage" % APP_HOSTNAME);
-        # call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
-        #    to=recp, from_=TWILIO_FROM)
+        call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
+            to=recp, from_=TWILIO_FROM)
 
 
 class CheckUptimes(webapp2.RequestHandler):
