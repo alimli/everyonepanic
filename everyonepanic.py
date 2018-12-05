@@ -1,7 +1,7 @@
 import contextlib
 import json
 import os
-from urllib.request import urlopen
+import urllib2
 import webapp2
 from twilio.rest import TwilioRestClient
 
@@ -36,7 +36,7 @@ class MainPage(webapp2.RequestHandler):
 
 
 def get_uptime_status():
-    with contextlib.closing(urlopen(UPTIME_ROBOT)) as ustream:
+    with contextlib.closing(urllib2.urlopen(UPTIME_ROBOT)) as ustream:
         resp = json.load(ustream)
 
     downsites = []
