@@ -1,1 +1,1 @@
-web: gunicorn everyonepanic:application
+web: gunicorn everyonepanic:application --log-level debug
