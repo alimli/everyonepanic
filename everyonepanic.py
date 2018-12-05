@@ -15,7 +15,7 @@ TWILIO_FROM = os.environ['TWILIO_FROM']
 CALLEES = os.environ['CALLEES'].split(',')
 
 UPTIME_ROBOT_KEY = os.environ['UPTIME_ROBOT_KEY']
-UPTIME_ROBOT = "http://api.uptimerobot.com/getMonitors?apiKey=" + UPTIME_ROBOT_KEY + "&format=json&noJsonCallback=1"
+UPTIME_ROBOT = "https://api.uptimerobot.com/getMonitors?apiKey=" + UPTIME_ROBOT_KEY + "&format=json&noJsonCallback=1"
 
 # what's our app name?
 APP_HOSTNAME = "YOUR_APP_HERE.appspot.com"
@@ -50,7 +50,7 @@ def get_uptime_status():
 def trigger_call(recipients):
     client = TwilioRestClient(TWILIO_SID, TWILIO_TOKEN)
     for recp in recipients:
-        call = client.calls.create(url=("http://%s/downmessage" % APP_HOSTNAME),
+        call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
             to=recp, from_=TWILIO_FROM)
 
 
