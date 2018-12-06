@@ -58,7 +58,7 @@ def trigger_call(recp):
     print(call)
 
 class CheckUptimes(webapp2.RequestHandler):
-    def get(self):https://stackoverflow.com/questions/32401387/git-add-adding-ignored-files
+    def get(self):
         self.response.headers['Content-Type'] = 'text/plain'
         res = get_uptime_status()
 
