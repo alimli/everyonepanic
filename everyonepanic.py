@@ -93,7 +93,11 @@ class StatusCallBack(webapp2.RequestHandler):
         url_params = urlparse.parse_qs(self.request.body)
         to = url_params['To'][0]
         call_status =  url_params['CallStatus'][0]
-        to_index = CALLEES.index_of(to)
+        try:
+            to_index = CALLEES.index(to)
+        except ValueError:
+            to_index = 0
+            
         if call_status in ['busy', 'no-answer']:
             next_to_index = (to_index + 1) % CALLEES.count
             trigger_call(CALLEES[next_to_index])
