@@ -62,7 +62,7 @@ class CheckUptimes(webapp2.RequestHandler):
         res = get_uptime_status()
 
         self.response.write("Critical Alarms: %s\n" % ", ".join(UPTIME_CRITICAL_ALARMS))
-        critical_alarm_count = UPTIME_CRITICAL_ALARMS and len(UPTIME_CRITICAL_ALARMS) : res['total']
+        critical_alarm_count = UPTIME_CRITICAL_ALARMS and len(UPTIME_CRITICAL_ALARMS) or res['total']
         self.response.write("%d sites being monitored. %d of them are critical.\n" % (res['total'], critical_alarm_count))
         if res['down'] != 0:
             self.response.write("Everybody panic!\n")
