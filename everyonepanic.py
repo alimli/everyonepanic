@@ -44,7 +44,7 @@ def get_uptime_status():
 
     downsites = []
     for m in resp['monitors']['monitor']:
-        if m['status'] == "9" and (is_empty(UPTIME_CRITICAL_ALARMS) or m['friendlyname'] in UPTIME_CRITICAL_ALARMS):  # 9 == "Down", 8 == "Seems down"
+        if m['status'] == "9" and ( not UPTIME_CRITICAL_ALARMS or (m['friendlyname'] in UPTIME_CRITICAL_ALARMS) ):  # 9 == "Down", 8 == "Seems down"
             downsites.append(m['friendlyname'])
     return {"total": len(resp['monitors']['monitor']), "down": len(downsites), "downsites": downsites}
 
