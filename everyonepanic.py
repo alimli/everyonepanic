@@ -17,7 +17,7 @@ CALLEES = os.environ['CALLEES'].split(',')
 UPTIME_ROBOT_KEY = os.environ['UPTIME_ROBOT_KEY']
 UPTIME_ROBOT = "https://api.uptimerobot.com/getMonitors?apiKey=" + UPTIME_ROBOT_KEY + "&format=json&noJsonCallback=1"
 UPTIME_CRITICAL_ALARMS = {}
-if('UPTIME_CRITICAL_ALARMS' in os.environ)
+if 'UPTIME_CRITICAL_ALARMS' in os.environ:
     UPTIME_CRITICAL_ALARMS = os.environ['UPTIME_CRITICAL_ALARMS'].split(',')
 
 # what's our app name?
