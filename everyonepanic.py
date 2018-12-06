@@ -5,6 +5,8 @@ import urllib2
 import webapp2
 from twilio.rest import TwilioRestClient
 import urlparse
+import datetime
+import pytz
 
 # Calls you when your sites go down.
 # License is GPLv3.
@@ -16,10 +18,21 @@ TWILIO_FROM = os.environ['TWILIO_FROM']
 CALLEES = os.environ['CALLEES'].split(',')
 
 UPTIME_ROBOT_KEY = os.environ['UPTIME_ROBOT_KEY']
-UPTIME_ROBOT = "https://api.uptimerobot.com/getMonitors?apiKey=" + UPTIME_ROBOT_KEY + "&format=json&noJsonCallback=1"
-UPTIME_CRITICAL_ALARMS = {}
-if 'UPTIME_CRITICAL_ALARMS' in os.environ:
-    UPTIME_CRITICAL_ALARMS = os.environ['UPTIME_CRITICAL_ALARMS'].split(',')
+# Statuses= 9 Fetches Only Down Monitors
+# Logs = 1 Includes Log in the response so that down period can be calculated
+UPTIME_ROBOT = "https://api.uptimerobot.com/getMonitors?apiKey=" + UPTIME_ROBOT_KEY + "&format=json&noJsonCallback=1&logs=1"
+UPTIME_CRITICAL_MONITORS = {}
+if 'UPTIME_CRITICAL_MONITORS' in os.environ:
+    UPTIME_CRITICAL_MONITORS = os.environ['UPTIME_CRITICAL_MONITORS'].split(',')
+
+DOWN_TIME_MINUTES = 60
+if 'DOWN_TIME_MINUTES' in os.environ:
+     DOWN_TIME_MINUTES = int(os.environ['DOWN_TIME_MINUTES'])
+
+DOWN_TIME_TZ = pytz.timezone('Europe/Istanbul')
+if 'DOWN_TIME_TZ' in os.environ:
+     DOWN_TIME_TZ = pytz.timezone(os.environ['DOWN_TIME_TZ'])
+
 
 # what's our app name?
 APP_HOSTNAME = "YOUR_APP_HERE.appspot.com"
@@ -44,11 +57,17 @@ def get_uptime_status():
         resp = json.load(ustream)
 
     downsites = []
-    for m in resp['monitors']['monitor']:
-        if m['status'] == "9" and ( not UPTIME_CRITICAL_ALARMS or (m['friendlyname'] in UPTIME_CRITICAL_ALARMS) ):  # 9 == "Down", 8 == "Seems down"
-            downsites.append(m['friendlyname'])
-    return {"total": len(resp['monitors']['monitor']), "down": len(downsites), "downsites": downsites}
-
+    if(resp['monitors']):
+        for m in resp['monitors']['monitor']:
+            if m['status'] == "9" and ( not UPTIME_CRITICAL_MONITORS or (m['friendlyname'] in UPTIME_CRITICAL_MONITORS) ):  # 9 == "Down", 8 == "Seems down"
+                print(m)
+                last_down_time = datetime.datetime.strptime( m['log'][0]['datetime'], "%m/%d/%Y %H:%M:%S")
+                now = datetime.datetime.now(DOWN_TIME_TZ).replace(tzinfo=None)
+                if (now - last_down_time) > datetime.timedelta(minutes=DOWN_TIME_MINUTES):
+                    downsites.append(m['friendlyname'])
+        return {"total": len(resp['monitors']['monitor']), "down": len(downsites), "downsites": downsites}
+    else:
+        return {"total": 0, "down": 0, "downsites": downsites}
 
 def trigger_call(recp):
     client = TwilioRestClient(TWILIO_SID, TWILIO_TOKEN)
@@ -62,13 +81,13 @@ class CheckUptimes(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         res = get_uptime_status()
 
-        self.response.write("Critical Alarms: %s\n" % ", ".join(UPTIME_CRITICAL_ALARMS))
-        critical_alarm_count = UPTIME_CRITICAL_ALARMS and len(UPTIME_CRITICAL_ALARMS) or res['total']
+        self.response.write("Critical Monitors: %s\n" % ", ".join(UPTIME_CRITICAL_MONITORS))
+        critical_alarm_count = UPTIME_CRITICAL_MONITORS and len(UPTIME_CRITICAL_MONITORS) or res['total']
         self.response.write("%d sites being monitored. %d of them are critical.\n" % (res['total'], critical_alarm_count))
         if res['down'] != 0:
             self.response.write("Everybody panic!\n")
             for site in res['downsites']:
-                self.response.write("%s is down.\n" % site)
+                self.response.write("%s is down more than %d minutes.\n" % (site, DOWN_TIME_MINUTES))
             trigger_call(CALLEES[0])
         else:
             self.response.write("Everything seems fine\n")
