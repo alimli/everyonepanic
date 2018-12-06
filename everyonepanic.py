@@ -16,7 +16,9 @@ CALLEES = os.environ['CALLEES'].split(',')
 
 UPTIME_ROBOT_KEY = os.environ['UPTIME_ROBOT_KEY']
 UPTIME_ROBOT = "https://api.uptimerobot.com/getMonitors?apiKey=" + UPTIME_ROBOT_KEY + "&format=json&noJsonCallback=1"
-UPTIME_CRITICAL_ALARMS = os.environ['UPTIME_CRITICAL_ALARMS'].split(',')
+UPTIME_CRITICAL_ALARMS = {}
+if('UPTIME_CRITICAL_ALARMS' in os.environ)
+    UPTIME_CRITICAL_ALARMS = os.environ['UPTIME_CRITICAL_ALARMS'].split(',')
 
 # what's our app name?
 APP_HOSTNAME = "YOUR_APP_HERE.appspot.com"
@@ -59,7 +61,7 @@ class CheckUptimes(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'text/plain'
         res = get_uptime_status()
 
-        self.response.write("Critical Alarms: %s" % ", ".join(UPTIME_CRITICAL_ALARMS))
+        self.response.write("Critical Alarms: %s\n" % ", ".join(UPTIME_CRITICAL_ALARMS))
         self.response.write("%d sites being monitored\n" % res['total'])
         if res['down'] != 0:
             self.response.write("Everybody panic!\n")
