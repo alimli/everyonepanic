@@ -92,7 +92,7 @@ class StatusCallBack(webapp2.RequestHandler):
     def post(self):
         print(self.request)
 
-    def get(self)
+    def get(self):
         print(self.request)
 
 application = webapp2.WSGIApplication([
