@@ -97,9 +97,9 @@ class StatusCallBack(webapp2.RequestHandler):
             to_index = CALLEES.index(to)
         except ValueError:
             to_index = 0
-            
+
         if call_status in ['busy', 'no-answer']:
-            next_to_index = (to_index + 1) % CALLEES.count
+            next_to_index = (to_index + 1) % len(CALLEES)
             trigger_call(CALLEES[next_to_index])
 
 
