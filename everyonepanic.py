@@ -92,6 +92,9 @@ class StatusCallBack(webapp2.RequestHandler):
     def post(self):
         print(self.request)
 
+    def get(self)
+        print(self.request)
+
 application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/checksites', CheckUptimes),
