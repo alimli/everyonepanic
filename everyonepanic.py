@@ -55,9 +55,10 @@ def trigger_call(recp):
     call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
         to=recp, from_=TWILIO_FROM, status_callback=("https://%s/statuscallback" % APP_HOSTNAME),
         status_callback_event=['completed'], status_callback_method='POST')
+    print(call)
 
 class CheckUptimes(webapp2.RequestHandler):
-    def get(self):
+    def get(self):https://stackoverflow.com/questions/32401387/git-add-adding-ignored-files
         self.response.headers['Content-Type'] = 'text/plain'
         res = get_uptime_status()
 
@@ -110,5 +111,5 @@ application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/checksites', CheckUptimes),
     ('/downmessage', DowntimeMessage),
-    ('/statuscallback', StatusCallBack)
+    ('/statuscallback', StatusCallBack),
 ], debug=True)
