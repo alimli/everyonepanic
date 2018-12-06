@@ -88,6 +88,7 @@ class DowntimeMessage(webapp2.RequestHandler):
                 <Say voice="alice">False alarm. %d of %d sites are down.</Say>
             </Response>""" % (res['down'], res['total']))
 
+
 class StatusCallBack(webapp2.RequestHandler):
     def post(self):
         url_params = urlparse.parse_qs(self.request.body)
