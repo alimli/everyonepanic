@@ -4,6 +4,7 @@ import os
 import urllib2
 import webapp2
 from twilio.rest import TwilioRestClient
+import urlparse
 
 # Calls you when your sites go down.
 # License is GPLv3.
@@ -53,8 +54,8 @@ def trigger_call(recipients):
     client = TwilioRestClient(TWILIO_SID, TWILIO_TOKEN)
     for recp in recipients:
         call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
-            to=recp, from_=TWILIO_FROM, statusCallback=("https://%s/statuscallback" % APP_HOSTNAME),
-            statusCallbackEvent=['completed'], statusCallbackMethod='POST')
+            to=recp, from_=TWILIO_FROM, status_callback=("https://%s/statuscallback" % APP_HOSTNAME),
+            status_callback_event=['completed'], status_callback_method='POST')
 
 class CheckUptimes(webapp2.RequestHandler):
     def get(self):
@@ -90,10 +91,9 @@ class DowntimeMessage(webapp2.RequestHandler):
 
 class StatusCallBack(webapp2.RequestHandler):
     def post(self):
-        print(self.request)
+        print(urlparse.parse_qs(self.request.body))
 
-    def get(self):
-        print(self.request)
+
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
