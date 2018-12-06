@@ -99,11 +99,11 @@ class StatusCallBack(webapp2.RequestHandler):
         except ValueError:
             to_index = 0
 
+        print("Call to %s completed as %s" % (to, call_status))
         if call_status in ['busy', 'no-answer']:
             next_to_index = (to_index + 1) % len(CALLEES)
+            print("Calling %s\n" % CALLEES[next_to_index])
             trigger_call(CALLEES[next_to_index])
-
-
 
 
 application = webapp2.WSGIApplication([
