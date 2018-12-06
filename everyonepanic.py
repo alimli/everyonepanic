@@ -81,7 +81,7 @@ class DowntimeMessage(webapp2.RequestHandler):
         if res['down'] != 0:
             self.response.write("""<?xml version="1.0" encoding="UTF-8"?>
             <Response>
-                <Say voice="alice">Everyone panic! %s</Say>
+                <Say voice="alice" loop="10">Everyone panic! %s</Say>
             </Response>""" % " ".join(map(lambda s: ("%s is down." % s), res['downsites'])))
         else:
             self.response.write("""<?xml version="1.0" encoding="UTF-8"?>
