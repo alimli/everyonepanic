@@ -50,12 +50,11 @@ def get_uptime_status():
     return {"total": len(resp['monitors']['monitor']), "down": len(downsites), "downsites": downsites}
 
 
-def trigger_call(recipients):
+def trigger_call(recp):
     client = TwilioRestClient(TWILIO_SID, TWILIO_TOKEN)
-    for recp in recipients:
-        call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
-            to=recp, from_=TWILIO_FROM, status_callback=("https://%s/statuscallback" % APP_HOSTNAME),
-            status_callback_event=['completed'], status_callback_method='POST')
+    call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
+        to=recp, from_=TWILIO_FROM, status_callback=("https://%s/statuscallback" % APP_HOSTNAME),
+        status_callback_event=['completed'], status_callback_method='POST')
 
 class CheckUptimes(webapp2.RequestHandler):
     def get(self):
@@ -69,7 +68,7 @@ class CheckUptimes(webapp2.RequestHandler):
             self.response.write("Everybody panic!\n")
             for site in res['downsites']:
                 self.response.write("%s is down.\n" % site)
-            trigger_call(CALLEES)
+            trigger_call(CALLEES[0])
         else:
             self.response.write("Everything seems fine\n")
 
@@ -91,7 +90,14 @@ class DowntimeMessage(webapp2.RequestHandler):
 
 class StatusCallBack(webapp2.RequestHandler):
     def post(self):
-        print(urlparse.parse_qs(self.request.body))
+        url_params = urlparse.parse_qs(self.request.body)
+        to = url_params['To'][0]
+        call_status =  url_params['CallStatus'][0]
+        to_index = CALLEES.indexOf(to)
+        if call_status in ['busy', 'no-answer']:            
+            next_to_index = (to_index + 1) % CALLEES.count
+            trigger_call(CALLEES[next_to_index])
+
 
 
 
