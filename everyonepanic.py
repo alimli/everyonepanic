@@ -53,8 +53,8 @@ def trigger_call(recipients):
     client = TwilioRestClient(TWILIO_SID, TWILIO_TOKEN)
     for recp in recipients:
         call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
-            to=recp, from_=TWILIO_FROM, statusCallBack=("https://%s/statuscallback" % APP_HOSTNAME),
-            statusCallBackEvent=['completed'], statusCallBackMethod='POST')
+            to=recp, from_=TWILIO_FROM, statusCallback=("https://%s/statuscallback" % APP_HOSTNAME),
+            statusCallbackEvent=['completed'], statusCallbackMethod='POST')
 
 class CheckUptimes(webapp2.RequestHandler):
     def get(self):
