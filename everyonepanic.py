@@ -41,7 +41,6 @@ def get_uptime_status():
         resp = json.load(ustream)
 
     downsites = []
-    self.response.write("Critical Alarms: %s" % ", ".join(UPTIME_CRITICAL_ALARMS))
     for m in resp['monitors']['monitor']:
         if m['status'] == "9 and (is_empty(UPTIME_CRITICAL_ALARMS) or m['friendlyname'] in UPTIME_CRITICAL_ALARMS)":  # 9 == "Down", 8 == "Seems down"
             downsites.append(m['friendlyname'])
@@ -59,6 +58,8 @@ class CheckUptimes(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/plain'
         res = get_uptime_status()
+
+        self.response.write("Critical Alarms: %s" % ", ".join(UPTIME_CRITICAL_ALARMS))
         self.response.write("%d sites being monitored\n" % res['total'])
         if res['down'] != 0:
             self.response.write("Everybody panic!\n")
