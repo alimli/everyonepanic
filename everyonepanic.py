@@ -53,8 +53,8 @@ def trigger_call(recipients):
     client = TwilioRestClient(TWILIO_SID, TWILIO_TOKEN)
     for recp in recipients:
         call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
-            to=recp, from_=TWILIO_FROM)
-
+            to=recp, from_=TWILIO_FROM, statusCallBack=("https://%s/statuscallback" % APP_HOSTNAME),
+            statusCallBackEvent=['completed'], statusCallBackMethod='POST')
 
 class CheckUptimes(webapp2.RequestHandler):
     def get(self):
@@ -88,9 +88,13 @@ class DowntimeMessage(webapp2.RequestHandler):
                 <Say voice="alice">False alarm. %d of %d sites are down.</Say>
             </Response>""" % (res['down'], res['total']))
 
+class StatusCallBack(webapp2.RequestHandler):
+    def post(self):
+        print(self.request)
 
 application = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/checksites', CheckUptimes),
     ('/downmessage', DowntimeMessage),
+    ('/statuscallback', StatusCallBack)
 ], debug=True)
