@@ -16,6 +16,7 @@ CALLEES = os.environ['CALLEES'].split(',')
 
 UPTIME_ROBOT_KEY = os.environ['UPTIME_ROBOT_KEY']
 UPTIME_ROBOT = "https://api.uptimerobot.com/getMonitors?apiKey=" + UPTIME_ROBOT_KEY + "&format=json&noJsonCallback=1"
+UPTIME_CRITICAL_ALARMS = os.environ['UPTIME_CRITICAL_ALARMS'].split(',')
 
 # what's our app name?
 APP_HOSTNAME = "YOUR_APP_HERE.appspot.com"
@@ -42,7 +43,7 @@ def get_uptime_status():
     downsites = []
 
     for m in resp['monitors']['monitor']:
-        if m['status'] == "9":  # 9 == "Down", 8 == "Seems down"
+        if m['status'] == "9 and (is_empty(UPTIME_CRITICAL_ALARMS) or m['friendlyname'] in UPTIME_CRITICAL_ALARMS)":  # 9 == "Down", 8 == "Seems down"
             downsites.append(m['friendlyname'])
     return {"total": len(resp['monitors']['monitor']), "down": len(downsites), "downsites": downsites}
 
@@ -76,7 +77,7 @@ class DowntimeMessage(webapp2.RequestHandler):
             self.response.write("""<?xml version="1.0" encoding="UTF-8"?>
             <Response>
                 <Say voice="alice">Everyone panic! %s</Say>
-            </Response>""" % " ".join(map(lambda s: ("%s is down." % s.replace("doublemap", "double map")), res['downsites'])))
+            </Response>""" % " ".join(map(lambda s: ("%s is down." % s), res['downsites'])))
         else:
             self.response.write("""<?xml version="1.0" encoding="UTF-8"?>
             <Response>
