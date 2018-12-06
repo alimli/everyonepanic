@@ -41,7 +41,7 @@ def get_uptime_status():
         resp = json.load(ustream)
 
     downsites = []
-
+    self.response.write("Critical Alarms: %s" % ", ".join(UPTIME_CRITICAL_ALARMS)
     for m in resp['monitors']['monitor']:
         if m['status'] == "9 and (is_empty(UPTIME_CRITICAL_ALARMS) or m['friendlyname'] in UPTIME_CRITICAL_ALARMS)":  # 9 == "Down", 8 == "Seems down"
             downsites.append(m['friendlyname'])
