@@ -73,7 +73,8 @@ def trigger_call(recp):
     client = TwilioRestClient(TWILIO_SID, TWILIO_TOKEN)
     call = client.calls.create(url=("https://%s/downmessage" % APP_HOSTNAME),
         to=recp, from_=TWILIO_FROM, status_callback=("https://%s/statuscallback" % APP_HOSTNAME),
-        status_callback_event=['completed'], status_callback_method='POST')
+        status_callback_event=['completed'], status_callback_method='POST',
+        machine_detection='Enable') # machine_detection : Ensure call not answered by Voicemail
     print(call)
 
 class CheckUptimes(webapp2.RequestHandler):
@@ -115,13 +116,14 @@ class StatusCallBack(webapp2.RequestHandler):
         print url_params
         to = url_params['To'][0]
         call_status =  url_params['CallStatus'][0]
+        answered_by = url_params['AnsweredBy'][0]
         try:
             to_index = CALLEES.index(to)
         except ValueError:
             to_index = 0
 
-        print("Call to %s completed as %s" % (to, call_status))
-        if call_status in ['busy', 'no-answer', 'failed']:
+        print("Call to %s completed as %s and answered by %s" % (to, call_status, answered_by))
+        if call_status in ['busy', 'no-answer', 'failed'] or answered_by != 'human':
             next_to_index = (to_index + 1) % len(CALLEES)
             print("Calling %s\n" % CALLEES[next_to_index])
             trigger_call(CALLEES[next_to_index])
