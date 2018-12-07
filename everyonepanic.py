@@ -112,6 +112,7 @@ class DowntimeMessage(webapp2.RequestHandler):
 class StatusCallBack(webapp2.RequestHandler):
     def post(self):
         url_params = urlparse.parse_qs(self.request.body)
+        print url_params
         to = url_params['To'][0]
         call_status =  url_params['CallStatus'][0]
         try:
@@ -120,7 +121,7 @@ class StatusCallBack(webapp2.RequestHandler):
             to_index = 0
 
         print("Call to %s completed as %s" % (to, call_status))
-        if call_status in ['busy', 'no-answer']:
+        if call_status in ['busy', 'no-answer', 'failed']:
             next_to_index = (to_index + 1) % len(CALLEES)
             print("Calling %s\n" % CALLEES[next_to_index])
             trigger_call(CALLEES[next_to_index])
